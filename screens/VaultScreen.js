@@ -29,18 +29,148 @@ export default function VaultScreen() {
   const [journalSummaries, setJournalSummaries] = useState([]);
   const [favoriteAffirmation, setFavoriteAffirmation] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
+  // Define styles inside the component to access theme
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background, // Apply background here
+    },
+    scrollContent: {
+      padding: theme.spacing.m, // Use theme spacing
+    },
+    header: {
+      marginBottom: theme.spacing.l, // Use theme spacing
+    },
+    title: {
+      fontSize: theme.typography.fontSizes.xl, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.bold, // Apply font
+      color: theme.colors.text, // Use theme color
+      marginBottom: theme.spacing.xs, // Use theme spacing
+    },
+    subtitle: {
+      fontSize: theme.typography.fontSizes.m, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.subText, // Use theme color
+    },
+    card: {
+      padding: theme.spacing.m, // Use theme spacing
+      marginBottom: theme.spacing.l, // Use theme spacing
+      backgroundColor: theme.colors.card, // Use theme color
+      borderRadius: theme.roundness.m, // Use theme roundness
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.m, // Use theme spacing
+    },
+    cardTitle: {
+      fontSize: theme.typography.fontSizes.l, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.medium, // Apply font
+      color: theme.colors.text, // Use theme color
+      marginLeft: theme.spacing.s, // Use theme spacing
+    },
+    streakContent: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'center',
+      marginBottom: theme.spacing.s, // Use theme spacing
+    },
+    streakNumber: {
+      fontSize: theme.typography.fontSizes.xxl, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.bold, // Apply font
+      color: theme.colors.primary, // Use theme color
+      marginRight: theme.spacing.xs, // Use theme spacing
+    },
+    streakLabel: {
+      fontSize: theme.typography.fontSizes.m, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.subText, // Use theme color
+    },
+    streakMessage: {
+      fontSize: theme.typography.fontSizes.s, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.subText, // Use theme color
+      textAlign: 'center',
+    },
+    section: {
+      marginBottom: theme.spacing.l, // Use theme spacing
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSizes.l, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.medium, // Apply font
+      color: theme.colors.text, // Use theme color
+      marginBottom: theme.spacing.m, // Use theme spacing
+    },
+    loader: {
+      marginTop: theme.spacing.xl, // Use theme spacing
+    },
+    summaryCard: {
+      padding: theme.spacing.m, // Use theme spacing
+      marginBottom: theme.spacing.m, // Use theme spacing
+      backgroundColor: theme.colors.card, // Use theme color
+      borderRadius: theme.roundness.m, // Use theme roundness
+      borderLeftWidth: 4,
+    },
+    summaryHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.s, // Use theme spacing
+    },
+    summaryDate: {
+      fontSize: theme.typography.fontSizes.xs, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.subText, // Use theme color
+    },
+    moodTag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background, // Use theme color for contrast
+      paddingVertical: theme.spacing.xxs, // Use theme spacing
+      paddingHorizontal: theme.spacing.xs, // Use theme spacing
+      borderRadius: theme.roundness.s, // Use theme roundness
+    },
+    moodText: {
+      marginLeft: theme.spacing.xxs, // Use theme spacing
+      fontSize: theme.typography.fontSizes.xs, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.medium, // Apply font
+      textTransform: 'capitalize',
+    },
+    summaryText: {
+      fontSize: theme.typography.fontSizes.s, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.text, // Use theme color
+      lineHeight: theme.typography.lineHeights.s, // Use theme line height
+    },
+    emptyState: {
+      padding: theme.spacing.l, // Use theme spacing
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.card, // Use theme color
+      borderRadius: theme.roundness.m, // Use theme roundness
+      minHeight: 150,
+    },
+    emptyStateText: {
+      fontSize: theme.typography.fontSizes.s, // Use theme font size
+      fontFamily: theme.typography.fontFamilies.regular, // Apply font
+      color: theme.colors.subText, // Use theme color
+      textAlign: 'center',
+      marginTop: theme.spacing.m, // Use theme spacing
+    },
+  });
+
   // Load journal summaries when component mounts
   useEffect(() => {
     const loadJournalData = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
         const { summaries, error } = await getWeeklySummary(user.id);
-        
+
         if (error) throw error;
-        
+
         setJournalSummaries(summaries || []);
       } catch (error) {
         console.error('Error loading journal summaries:', error);
@@ -48,53 +178,37 @@ export default function VaultScreen() {
         setLoading(false);
       }
     };
-    
+
     loadJournalData();
   }, [user]);
-  
+
   // Toggle favorite affirmation
   const toggleFavorite = () => {
     setFavoriteAffirmation(!favoriteAffirmation);
     // In a real app, save this to the database
   };
-  
+
   // Render streak card
   const renderStreakCard = () => (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: theme.colors.card,
-          borderRadius: theme.roundness.m,
-        },
-      ]}
-    >
+    <View style={styles.card}>
       <View style={styles.cardHeader}>
         <MaterialCommunityIcons name="fire" size={24} color={theme.colors.warning} />
-        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Ritual Streak</Text>
+        <Text style={styles.cardTitle}>Ritual Streak</Text>
       </View>
-      
+
       <View style={styles.streakContent}>
-        <Text style={[styles.streakNumber, { color: theme.colors.primary }]}>
-          {ritualStreak}
-        </Text>
-        <Text style={[styles.streakLabel, { color: theme.colors.subText }]}>
-          {ritualStreak === 1 ? 'day' : 'days'}
-        </Text>
+        <Text style={styles.streakNumber}>{ritualStreak}</Text>
+        <Text style={styles.streakLabel}>{ritualStreak === 1 ? 'day' : 'days'}</Text>
       </View>
-      
-      <Text style={[styles.streakMessage, { color: theme.colors.subText }]}>
-        {getStreakMessage(ritualStreak)}
-      </Text>
+
+      <Text style={styles.streakMessage}>{getStreakMessage(ritualStreak)}</Text>
     </View>
   );
-  
+
   // Render affirmation card
   const renderAffirmationCard = () => (
     <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-        Daily Affirmation
-      </Text>
+      <Text style={styles.sectionTitle}>Daily Affirmation</Text>
       <AffirmationCard
         affirmation={getTodaysAffirmation()}
         onFavorite={toggleFavorite}
@@ -102,14 +216,12 @@ export default function VaultScreen() {
       />
     </View>
   );
-  
+
   // Render journal summaries
   const renderJournalSummaries = () => (
     <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-        Recent Journal Insights
-      </Text>
-      
+      <Text style={styles.sectionTitle}>Recent Journal Insights</Text>
+
       {loading ? (
         <ActivityIndicator size="large" color={theme.colors.primary} style={styles.loader} />
       ) : journalSummaries.length > 0 ? (
@@ -119,71 +231,48 @@ export default function VaultScreen() {
             style={[
               styles.summaryCard,
               {
-                backgroundColor: theme.colors.card,
-                borderRadius: theme.roundness.m,
                 borderLeftColor: getMoodColor(summary.mood_tag, theme),
               },
             ]}
           >
             <View style={styles.summaryHeader}>
-              <Text style={[styles.summaryDate, { color: theme.colors.subText }]}>
-                {formatRelativeDate(summary.entry_date)}
-              </Text>
+              <Text style={styles.summaryDate}>{formatRelativeDate(summary.entry_date)}</Text>
               <View style={styles.moodTag}>
                 <MaterialCommunityIcons
                   name={getMoodIcon(summary.mood_tag)}
                   size={16}
                   color={getMoodColor(summary.mood_tag, theme)}
                 />
-                <Text
-                  style={[
-                    styles.moodText,
-                    { color: getMoodColor(summary.mood_tag, theme) },
-                  ]}
-                >
-                  {summary.mood_tag || 'neutral'}
-                </Text>
+                <Text style={styles.moodText}>{summary.mood_tag || 'neutral'}</Text>
               </View>
             </View>
-            
-            <Text style={[styles.summaryText, { color: theme.colors.text }]}>
-              {summary.ai_summary || 'No summary available.'}
-            </Text>
+
+            <Text style={styles.summaryText}>{summary.ai_summary || 'No summary available.'}</Text>
           </View>
         ))
       ) : (
-        <View
-          style={[
-            styles.emptyState,
-            {
-              backgroundColor: theme.colors.card,
-              borderRadius: theme.roundness.m,
-            },
-          ]}
-        >
+        <View style={styles.emptyState}>
           <MaterialCommunityIcons
             name="notebook-outline"
             size={40}
             color={theme.colors.subText}
           />
-          <Text style={[styles.emptyStateText, { color: theme.colors.subText }]}>
+          <Text style={styles.emptyStateText}>
             No journal entries yet. Complete your daily ritual to start building your vault.
           </Text>
         </View>
       )}
     </View>
   );
-  
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Your Vault</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.subText }]}>
-            Track your wealth journey progress
-          </Text>
+          <Text style={styles.title}>Your Vault</Text>
+          <Text style={styles.subtitle}>Track your wealth journey progress</Text>
         </View>
-        
+
         {renderStreakCard()}
         {renderAffirmationCard()}
         {renderJournalSummaries()}
@@ -244,114 +333,3 @@ const getMoodColor = (mood, theme) => {
       return theme.colors.subText;
   }
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginTop: 4,
-  },
-  card: {
-    padding: 16,
-    marginBottom: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  streakContent: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: 8,
-  },
-  streakNumber: {
-    fontSize: 40,
-    fontWeight: 'bold',
-  },
-  streakLabel: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  streakMessage: {
-    fontSize: 14,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  summaryCard: {
-    padding: 16,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  summaryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  summaryDate: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  moodTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  moodText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
-    marginLeft: 4,
-  },
-  summaryText: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  emptyState: {
-    padding: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyStateText: {
-    textAlign: 'center',
-    marginTop: 12,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  loader: {
-    marginVertical: 20,
-  },
-});

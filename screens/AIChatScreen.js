@@ -95,10 +95,12 @@ export default function AIChatScreen() {
       sentMessageBodyTextStyle: {
         ...ChatUI.defaultTheme.fonts.sentMessageBodyTextStyle,
         color: theme.colors.background, // User message text color (dark for light background)
+        fontFamily: theme.typography.fontFamilies.regular, // Apply Satoshi font
       },
       receivedMessageBodyTextStyle: {
         ...ChatUI.defaultTheme.fonts.receivedMessageBodyTextStyle,
         color: theme.colors.text, // AI message text color
+        fontFamily: theme.typography.fontFamilies.regular, // Apply Satoshi font
       },
       // Optional: Adjust caption colors if needed
       // sentMessageCaptionTextStyle: {

@@ -36,11 +36,28 @@ export const darkTheme = {
       xxl: 24,
       xxxl: 30,
     },
+    fontFamilies: {
+      regular: 'Satoshi-Regular',
+      medium: 'Satoshi-Medium',
+      bold: 'Satoshi-Bold',
+      light: 'Satoshi-Light',
+      black: 'Satoshi-Black',
+      italic: 'Satoshi-Italic',
+    },
     fontWeights: {
       regular: '400',
       medium: '500',
       bold: '700',
     },
+    lineHeights: {
+      xs: 18, // Approx 1.5 * 12
+      s: 21,  // Approx 1.5 * 14
+      m: 24,  // Approx 1.5 * 16
+      l: 27,  // Approx 1.5 * 18
+      xl: 30, // Approx 1.5 * 20
+      xxl: 36,// Approx 1.5 * 24
+      xxxl: 45// Approx 1.5 * 30
+    }
   },
   roundness: {
     s: 4,
@@ -92,6 +109,15 @@ export const lightTheme = {
       medium: '500',
       bold: '700',
     },
+    lineHeights: {
+      xs: 18,
+      s: 21,
+      m: 24,
+      l: 27,
+      xl: 30,
+      xxl: 36,
+      xxxl: 45
+    }
   },
   roundness: {
     s: 4,

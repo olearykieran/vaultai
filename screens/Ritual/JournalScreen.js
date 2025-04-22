@@ -26,24 +26,24 @@ import { getStreakBasedPrompt } from '../../utils/promptHelpers';
 
 // Journal screen component (third step in ritual)
 export default function JournalScreen({ navigation }) {
-  const { theme } = useTheme();
+  const { theme } = useTheme(); // Theme is available here
   const { user } = useAuth();
   const { ritualStreak, completedRitual } = useVault();
   const [journalPrompt, setJournalPrompt] = useState('');
   const [journalText, setJournalText] = useState('');
   const [moodTag, setMoodTag] = useState('focused');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Get a journal prompt based on user's streak
   useEffect(() => {
     setJournalPrompt(getStreakBasedPrompt(ritualStreak));
   }, [ritualStreak]);
-  
+
   // Handle mood selection
   const handleMoodSelect = (mood) => {
     setMoodTag(mood);
   };
-  
+
   // Handle finish ritual button press
   const handleFinishRitual = async () => {
     if (journalText.trim().length < 10) {
@@ -53,13 +53,13 @@ export default function JournalScreen({ navigation }) {
       );
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Generate AI summary
       const { summary } = await generateJournalSummary(journalText);
-      
+
       // Create journal entry in database
       const { entry, error } = await createJournalEntry({
         user_id: user.id,
@@ -67,15 +67,15 @@ export default function JournalScreen({ navigation }) {
         ai_summary: summary || 'No summary available',
         mood_tag: moodTag,
       });
-      
+
       if (error) throw error;
-      
+
       // Update ritual streak
       await completedRitual();
-      
+
       // Navigate back to home screen
       navigation.navigate('Home');
-      
+
       // Show success message
       Alert.alert(
         'Ritual Completed!',
@@ -91,7 +91,7 @@ export default function JournalScreen({ navigation }) {
       setIsSubmitting(false);
     }
   };
-  
+
   // Render mood buttons
   const renderMoodButtons = () => {
     const moods = [
@@ -101,17 +101,21 @@ export default function JournalScreen({ navigation }) {
       { value: 'ambitious', icon: 'rocket', color: theme.colors.secondary },
       { value: 'determined', icon: 'arm-flex', color: theme.colors.warning },
     ];
-    
+
     return moods.map((mood) => (
       <TouchableOpacity
         key={mood.value}
         style={[
-          styles.moodButton,
+          styles.moodButton, // Base style
           {
             backgroundColor:
               moodTag === mood.value ? mood.color : theme.colors.card,
             borderColor: mood.color,
-            borderRadius: theme.roundness.s,
+            borderRadius: theme.roundness.s, // Use theme value
+            paddingVertical: theme.spacing.xs, // Use theme value
+            paddingHorizontal: theme.spacing.s, // Use theme value
+            marginRight: theme.spacing.s, // Use theme value
+            marginBottom: theme.spacing.s, // Use theme value
           },
         ]}
         onPress={() => handleMoodSelect(mood.value)}
@@ -119,13 +123,19 @@ export default function JournalScreen({ navigation }) {
         <MaterialCommunityIcons
           name={mood.icon}
           size={20}
-          color={moodTag === mood.value ? '#FFFFFF' : mood.color}
+          // Use background (dark) icon color for active 'inspired', otherwise white for active, mood color for inactive.
+          color={moodTag === mood.value ? (mood.value === 'inspired' ? theme.colors.background : '#FFFFFF') : mood.color}
         />
         <Text
           style={[
-            styles.moodText,
+            styles.moodText, // Base style with font family
             {
-              color: moodTag === mood.value ? '#FFFFFF' : theme.colors.text,
+              // Conditional color logic from previous fix
+              color: moodTag === mood.value
+                       ? (mood.value === 'inspired' ? theme.colors.background : '#FFFFFF') // Use background (dark) text for active 'inspired'
+                       : mood.color, // Use mood color for inactive
+              marginLeft: theme.spacing.xs, // Use theme value
+              fontSize: theme.typography.fontSizes.s, // Use theme value
             },
           ]}
         >
@@ -134,39 +144,67 @@ export default function JournalScreen({ navigation }) {
       </TouchableOpacity>
     ));
   };
-  
+
   return (
-    <KeyboardAwareScrollView 
-      style={[styles.scrollView, { backgroundColor: theme.colors.background }]} 
-      contentContainerStyle={styles.scrollContent}
+    <KeyboardAwareScrollView
+      style={[styles.scrollView, { backgroundColor: theme.colors.background }]} // Apply background color inline
+      contentContainerStyle={[styles.scrollContent, { padding: theme.spacing.m }]} // Apply padding inline
       enableOnAndroid
     >
       <SafeAreaView style={styles.container}>
         {/* Header Section */}
-        <View style={styles.headerSection}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Daily Journal</Text>
-          <Text style={[styles.description, { color: theme.colors.subText }]}>
+        <View style={[styles.headerSection, { marginBottom: theme.spacing.l }]}>
+          <Text style={[
+            styles.title, // Base style with font family
+            {
+              color: theme.colors.text,
+              marginBottom: theme.spacing.s,
+              fontSize: theme.typography.fontSizes.xl, // Apply font size inline
+            }
+          ]}>
+            Daily Journal
+          </Text>
+          <Text style={[
+            styles.description, // Base style with font family
+            {
+              color: theme.colors.subText,
+              lineHeight: theme.typography.lineHeights.m, // Apply line height inline
+              fontSize: theme.typography.fontSizes.m, // Apply font size inline
+            }
+          ]}>
             Reflect on your wealth journey and capture your thoughts. This completes your
             daily ritual.
           </Text>
         </View>
-        
+
         {/* Journal Prompt */}
-        <JournalPrompt prompt={journalPrompt} style={styles.prompt} />
-        
+        <JournalPrompt
+          prompt={journalPrompt}
+          style={[styles.prompt, { marginBottom: theme.spacing.l }]} // Apply margin inline
+        />
+
         {/* Journal Input */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        <View style={[styles.section, { marginBottom: theme.spacing.l }]}>
+          <Text style={[
+            styles.sectionTitle, // Base style with font family
+            {
+              color: theme.colors.text,
+              marginBottom: theme.spacing.m,
+              fontSize: theme.typography.fontSizes.l, // Apply font size inline
+            }
+          ]}>
             Your Thoughts
           </Text>
           <TextInput
             style={[
-              styles.input,
+              styles.input, // Base style with font family, minHeight, etc.
               {
                 backgroundColor: theme.colors.card,
                 color: theme.colors.text,
                 borderColor: theme.colors.border,
                 borderRadius: theme.roundness.m,
+                padding: theme.spacing.m, // Apply padding inline
+                fontSize: theme.typography.fontSizes.m, // Apply font size inline
               },
             ]}
             placeholder="Start writing your journal entry..."
@@ -174,31 +212,38 @@ export default function JournalScreen({ navigation }) {
             value={journalText}
             onChangeText={setJournalText}
             multiline
-            numberOfLines={10}
+            // numberOfLines={10} // minHeight controls this
             textAlignVertical="top"
           />
         </View>
-        
+
         {/* Mood Selection */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        <View style={[styles.section, { marginBottom: theme.spacing.l }]}>
+          <Text style={[
+            styles.sectionTitle, // Base style with font family
+            {
+              color: theme.colors.text,
+              marginBottom: theme.spacing.m,
+              fontSize: theme.typography.fontSizes.l, // Apply font size inline
+            }
+          ]}>
             How are you feeling?
           </Text>
           <View style={styles.moodContainer}>{renderMoodButtons()}</View>
         </View>
-        
+
         {/* Finish Button */}
         <VaultButton
           title="Complete Ritual"
           onPress={handleFinishRitual}
           loading={isSubmitting}
-          style={styles.finishButton}
+          style={[styles.finishButton, { marginTop: theme.spacing.m }]} // Apply margin inline
           icon={
             <MaterialCommunityIcons
               name="check-circle"
               size={20}
               color="#FFFFFF"
-              style={{ marginRight: 8 }}
+              style={{ marginRight: theme.spacing.s }} // Use theme spacing
             />
           }
         />
@@ -207,6 +252,7 @@ export default function JournalScreen({ navigation }) {
   );
 }
 
+// Stylesheet moved outside the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -215,57 +261,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    flexGrow: 1, // Keep flexGrow
   },
   headerSection: {
-    marginBottom: 20,
+    // Basic structure
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontFamily: 'Satoshi-Bold', // Use direct font name
   },
   description: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontFamily: 'Satoshi-Regular', // Use direct font name
   },
   prompt: {
-    marginBottom: 20,
+    // Basic structure
   },
   section: {
-    marginBottom: 24,
+    // Basic structure
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
+    fontFamily: 'Satoshi-Medium', // Use direct font name
   },
   input: {
     minHeight: 200,
-    padding: 16,
     borderWidth: 1,
-    fontSize: 16,
+    fontFamily: 'Satoshi-Regular', // Use direct font name
+    textAlignVertical: 'top',
   },
   moodContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 8,
+    justifyContent: 'flex-start',
   },
   moodButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-    marginBottom: 8,
     borderWidth: 1,
   },
   moodText: {
-    marginLeft: 4,
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: 'Satoshi-Medium', // Use direct font name
   },
   finishButton: {
-    marginBottom: 20,
+    // Basic structure
   },
 });
